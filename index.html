@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spring SAD Companion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:400,700|Pacifico&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --spring-green: #9ee7b5;
+      --spring-pink: #ffe3ec;
+      --spring-blue: #cde7f0;
+      --spring-yellow: #fff8e3;
+      --spring-purple: #e8e3ff;
+      --primary: #47a76a;
+      --secondary: #ffb6b9;
+      --accent: #65c7be;
+      --card-bg: #ffffffee;
+      --mood-bg: #f3fcf6;
+      --shadow: 0 2px 16px #cde7c066;
+    }
+    body {
+      font-family: 'Quicksand', Arial, sans-serif;
+      background: linear-gradient(135deg, #fff8e3 0%, #9ee7b5 100%);
+      min-height: 100vh;
+      margin: 0;
+      color: #344a53;
+    }
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(90deg, #9ee7b5 60%, #ffe3ec 100%);
+      padding: 2.1rem 0 1.2rem 0;
+      border-radius: 0 0 46px 46px;
+      box-shadow: 0 8px 24px #acffd445;
+      margin-bottom: 2.1rem;
+      position: relative;
+    }
+    .spring-logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'Pacifico', cursive;
+      font-size: 2.6rem;
+      color: var(--primary);
+      letter-spacing: 1px;
+      text-shadow: 0 2px 10px #b2e7c7cc;
+      margin-bottom: 0.2rem;
+      user-select: none;
+    }
+    .spring-logo .flower {
+      font-size: 2.3rem;
+      margin-right: 0.18em;
+      filter: drop-shadow(0 2px 6px #65c7be99);
+    }
+    .spring-slogan {
+      color: #2b7a4b;
+      font-size: 1.15rem;
+      margin: 0;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      background: var(--spring-yellow);
+      border-radius: 20px;
+      box-shadow: 0 2px 8px #b2e7c7aa;
+      padding: 0.22em 1.5em;
+      margin-top: 0.6em;
+      font-family: 'Quicksand', Arial, sans-serif;
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.5rem;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 600px;
+    }
+    .mood-card {
+      background: var(--card-bg);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 2rem 2.2rem 2.2rem 2.2rem;
+      min-width: 335px;
+      max-width: 540px;
+      flex: 2 1 380px;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .mood-title {
+      font-size: 1.5rem;
+      color: var(--primary);
+      letter-spacing: 0.2px;
+      margin: 0 0 1.3em 0;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: .5em;
+    }
+    .mood-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 1.3em;
+      margin-bottom: 1.1em;
+    }
+    .mood-slider-value {
+      font-size: 2.2rem;
+      color: var(--primary);
+      font-family: 'Pacifico', cursive;
+      margin-left: 1em;
+      min-width: 2.2em;
+      text-align: center;
+    }
+    input[type=range] {
+      width: 60%;
+      accent-color: var(--primary);
+      background: var(--spring-green);
+      border-radius: 8px;
+      margin: 0 0.7em;
+    }
+    .mood-plot-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1.2em;
+      align-items: flex-start;
+      justify-content: flex-start;
+      width: 100%;
+    }
+    .mood-plot {
+      background: var(--mood-bg);
+      border-radius: 1em;
+      box-shadow: 0 1px 7px #b2e7c799;
+      padding: 1.1em 1.6em 1.1em 1.1em;
+      min-width: 0;
+      width: 100%;
+      flex: 1 1 0;
+    }
+    .mood-downloads {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2em;
+      margin-top: 0.7em;
+      align-items: stretch;
+    }
+    .btn {
+      font-family: 'Quicksand', Arial, sans-serif;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: .7em 1.2em;
+      font-size: 1.05em;
+      box-shadow: 0 2px 8px #cde7f033;
+      cursor: pointer;
+      margin-bottom: 0.4em;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn:hover { background: #388f5a; transform: translateY(-2px);}
+    .habit-card {
+      background: var(--spring-blue);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 2em 1.5em 2em 1.5em;
+      min-width: 300px;
+      max-width: 370px;
+      flex: 1 1 310px;
+      margin-bottom: 2rem;
+      align-self: flex-start;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .habit-title {
+      font-size: 1.27rem;
+      color: var(--secondary);
+      margin-bottom: 1.3em;
+      font-weight: bold;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: .4em;
+    }
+    .habit-box {
+      background: var(--spring-yellow);
+      border-radius: 16px;
+      margin: 1em 0 1.3em 0;
+      padding: 1.4em 3em 1.4em 1.3em;
+      /* Expanded right padding so text doesn't get blocked by the flower */
+      font-size: 1.13em;
+      color: #344a53;
+      font-style: italic;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      box-shadow: 0 1px 6px #b2e7c799;
+      position: relative;
+      width: 100%;
+      overflow-x: auto;
+      word-break: break-word;
+    }
+    .habit-flower {
+      position: absolute;
+      right: 1em;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.9em;
+      opacity: 0.78;
+      pointer-events: none;
+      z-index: 1;
+    }
+    /* Chatbot Minimized Button */
+    .chatbot-fab {
+      position: fixed;
+      right: 2.5vw;
+      bottom: 2.1vh;
+      z-index: 100;
+      background: linear-gradient(135deg, #b2e7c7 60%, #ffe3ec 100%);
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 28px #47a76a33;
+      width: 70px; height: 70px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+      font-size: 2.5rem;
+      outline: none;
+      color: var(--primary);
+      animation: spring-pop 0.7s;
+    }
+    .chatbot-fab:hover { box-shadow: 0 6px 36px #47a76a55; transform: scale(1.08);}
+    @keyframes spring-pop {
+      0% { transform: scale(0.7);}
+      75% { transform: scale(1.1);}
+      100% { transform: scale(1);}
+    }
+    .chatbot-modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(180,232,199,0.16);
+      z-index: 99;
+      display: none;
+      transition: background 0.2s;
+    }
+    .chatbot-modal-bg.active { display: block; }
+    .chatbot-modal {
+      position: fixed;
+      right: 2vw;
+      bottom: 6.5vh;
+      width: 375px;
+      max-width: 96vw;
+      height: 540px;
+      max-height: 94vh;
+      background: var(--spring-purple);
+      border-radius: 22px;
+      box-shadow: 0 6px 36px #47a76a66;
+      z-index: 102;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: opacity 0.2s;
+      opacity: 1;
+      animation: chat-pop 0.4s;
+    }
+    @keyframes chat-pop {
+      0% { transform: translateY(30px) scale(0.98); opacity: 0; }
+      80% { transform: translateY(-8px) scale(1.05); opacity: 1; }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .chatbot-header {
+      background: linear-gradient(90deg, #b2e7c7 60%, #ffe3ec 100%);
+      color: var(--primary);
+      padding: 1em 1.3em;
+      font-size: 1.21em;
+      font-family: 'Pacifico', cursive;
+      letter-spacing: 0.2px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-radius: 0 0 22px 22px;
+      font-weight: 600;
+    }
+    .chatbot-header .spring-leaf { font-size: 1.8em; margin-right: 0.2em;}
+    .chatbot-close {
+      background: transparent;
+      border: none;
+      font-size: 1.8em;
+      color: #47a76a;
+      cursor: pointer;
+      transition: color 0.13s;
+    }
+    .chatbot-close:hover { color: #e74c3c; }
+    .chatbot-content {
+      flex: 1 1 0%;
+      display: flex;
+      flex-direction: column;
+      padding: 1em 1em 1.2em 1em;
+      background: var(--spring-purple);
+      height: 100%;
+    }
+    .chat-history {
+      flex: 1 1 0%;
+      overflow-y: auto;
+      margin-bottom: 0.7em;
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      scrollbar-color: var(--spring-green) #e8e3ff66;
+      scrollbar-width: thin;
+      max-height: 350px;
+    }
+    .chat-msg {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.6em;
+      font-size: 1.1em;
+      max-width: 92%;
+      line-height: 1.45;
+    }
+    .msg-user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .msg-bot {
+      align-self: flex-start;
+    }
+    .msg-bubble {
+      padding: .7em 1em;
+      border-radius: 1.2em;
+      background: var(--spring-green);
+      color: #344a53;
+      box-shadow: 0 1px 6px #b2e7c799;
+      word-break: break-word;
+      font-size: 1.07em;
+      max-width: 330px;
+    }
+    .msg-bot .msg-bubble {
+      background: var(--spring-yellow);
+    }
+    .bot-avatar, .user-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 2px 8px #b2e7c799;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bot-avatar {
+      background: var(--spring-blue);
+      font-size: 1.8rem;
+      color: var(--primary);
+    }
+    .user-avatar {
+      background: var(--spring-pink);
+      font-size: 1.8rem;
+      color: var(--secondary);
+    }
+    .chat-input-row {
+      display: flex;
+      align-items: center;
+      gap: .8em;
+    }
+    .chat-input-row input {
+      flex-grow: 1;
+      padding: .8em 1em;
+      border: none;
+      border-radius: 1.5em;
+      font-size: 1.07em;
+      outline: none;
+      background: #fff;
+      box-shadow: 0 1px 6px #b2e7c799;
+      margin-right: .2em;
+    }
+    .chat-input-row button {
+      font-family: 'Quicksand', Arial, sans-serif;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 2em;
+      padding: .7em 1.5em;
+      font-size: 1.05em;
+      box-shadow: 0 2px 8px #cde7f033;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .chat-input-row button:hover { background: #3fa06d; }
+    @media (max-width: 900px) {
+      main { flex-direction: column; align-items: center; }
+      .mood-card, .habit-card { min-width: 92vw; max-width: 96vw; }
+      .chatbot-modal { right: 2vw; width: 98vw; }
+    }
+    @media (max-width: 600px) {
+      header .spring-logo { font-size: 1.5rem;}
+      .chatbot-modal { width: 98vw; min-width: unset; }
+      .mood-card { padding: 1.2em 0.6em 1.2em 0.6em; }
+      .habit-card { padding: 1.1em 0.6em 1.1em 0.6em;}
+      .mood-plot-row { flex-direction: column; }
+      .mood-downloads { flex-direction: row; gap:1em; margin-top:0;}
+    }
+    body::before, body::after {
+      content: "🌱";
+      font-size: 2.2rem;
+      position: fixed;
+      z-index: 0;
+      opacity: 0.14;
+      pointer-events: none;
+    }
+    body::before { left: 2vw; top: 2vh; }
+    body::after { right: 2vw; bottom: 2vh; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="spring-logo"><span class="flower">🌷</span>Spring SAD Companion</div>
+    <div class="spring-slogan">Gentle support &amp; growth—one spring day at a time.</div>
+  </header>
+  <main>
+    <!-- Mood Tracker -->
+    <section class="mood-card">
+      <div class="mood-title">🌤️ Daily Mood Tracker</div>
+      <div class="mood-slider-row">
+        <span>1</span>
+        <input type="range" min="1" max="10" value="5" id="mood-slider">
+        <span>10</span>
+        <div class="mood-slider-value" id="mood-slider-value">5</div>
+      </div>
+      <div class="mood-plot-row">
+        <div class="mood-plot">
+          <canvas id="mood-chart" height="170"></canvas>
+        </div>
+        <div class="mood-downloads">
+          <button class="btn" id="save-mood-btn">Save Mood</button>
+          <button class="btn" id="download-json-btn">Download JSON</button>
+          <button class="btn" id="download-csv-btn">Download CSV</button>
+        </div>
+      </div>
+    </section>
+    <!-- Habit Suggestion Box -->
+    <section class="habit-card">
+      <div class="habit-title">🌸 Spring Habit Suggestion</div>
+      <div class="habit-box"><span id="habit-tip"></span><span class="habit-flower">🌻</span></div>
+      <button class="btn" id="new-habit-btn">New Suggestion</button>
+    </section>
+  </main>
+
+  <!-- Chatbot Floating Button -->
+  <button class="chatbot-fab" id="open-chatbot" title="Chat with Spring!">
+    <span class="spring-leaf">🌱</span>
+  </button>
+  <div class="chatbot-modal-bg" id="chatbot-modal-bg"></div>
+  <div class="chatbot-modal" id="chatbot-modal" style="display:none;">
+    <div class="chatbot-header">
+      <span><span class="spring-leaf">🌱</span>Spring Companion</span>
+      <button class="chatbot-close" id="close-chatbot" title="Close">&times;</button>
+    </div>
+    <div class="chatbot-content">
+      <div class="chat-history" id="chat-history"></div>
+      <form class="chat-input-row" id="chat-form" autocomplete="off">
+        <input type="text" id="chat-input" placeholder="Type your thoughts…" autocomplete="off" required maxlength="400">
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    // --- Mood Tracker ---
+    const moodSlider = document.getElementById('mood-slider');
+    const moodSliderValue = document.getElementById('mood-slider-value');
+    const saveMoodBtn = document.getElementById('save-mood-btn');
+    const downloadJsonBtn = document.getElementById('download-json-btn');
+    const downloadCsvBtn = document.getElementById('download-csv-btn');
+    let moodData = [];
+
+    // LocalStorage Key
+    const MOOD_KEY = "spring_sad_moods";
+
+    function updateSliderDisplay() {
+      moodSliderValue.textContent = moodSlider.value;
+    }
+    moodSlider.addEventListener('input', updateSliderDisplay);
+
+    function fetchMoodData() {
+      try {
+        const stored = localStorage.getItem(MOOD_KEY);
+        moodData = stored ? JSON.parse(stored) : [];
+        renderMoodChart();
+      } catch (e) {
+        moodData = [];
+        renderMoodChart();
+      }
+    }
+    function saveMood() {
+      const today = new Date().toISOString().slice(0, 10);
+      const mood = parseInt(moodSlider.value);
+      // Check if today's mood is already set
+      const idx = moodData.findIndex(e => e.date === today);
+      if (idx !== -1) moodData[idx].mood = mood;
+      else moodData.push({ date: today, mood });
+      localStorage.setItem(MOOD_KEY, JSON.stringify(moodData));
+      fetchMoodData();
+    }
+    saveMoodBtn.addEventListener('click', saveMood);
+
+    let moodChart;
+    function renderMoodChart() {
+      const ctx = document.getElementById('mood-chart').getContext('2d');
+      const sorted = [...moodData].sort((a, b) => a.date.localeCompare(b.date));
+      const labels = sorted.map(e => e.date);
+      const data = sorted.map(e => e.mood);
+      if (moodChart) moodChart.destroy();
+      moodChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Mood',
+            data,
+            backgroundColor: 'rgba(76, 181, 130, 0.13)',
+            borderColor: 'rgba(76, 181, 130, 1)',
+            borderWidth: 2,
+            tension: 0.32,
+            pointBackgroundColor: 'var(--spring-pink)',
+            pointRadius: 5,
+            fill: true,
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              min: 1,
+              max: 10,
+              ticks: { stepSize: 1 }
+            }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function downloadFile(data, type, filename) {
+      const blob = new Blob([data], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 200);
+    }
+    downloadJsonBtn.addEventListener('click', () => {
+      downloadFile(JSON.stringify(moodData, null, 2), 'application/json', 'moods.json');
+    });
+    downloadCsvBtn.addEventListener('click', () => {
+      const csv = "date,mood\n" + moodData.map(e => `${e.date},${e.mood}`).join('\n');
+      downloadFile(csv, 'text/csv', 'moods.csv');
+    });
+
+    // --- Habit Suggestion Box ---
+    const habitTips = [
+      "Take a gentle walk outside and notice three new spring flowers.",
+      "Open your window for a few minutes and breathe in the fresh air.",
+      "Drink a glass of water and stretch for 2 minutes.",
+      "Write down something positive you noticed today.",
+      "Listen to a cheerful song and sway with the music.",
+      "Tend to a plant or start a tiny herb garden.",
+      "Sit in the sunlight for 5 minutes (even indoors).",
+      "Call or message a friend just to say hello.",
+      "Try a short mindful breathing exercise.",
+      "Read a poem about spring or nature.",
+      "Draw or doodle a flower, no matter your skill!",
+      "Plan a favorite spring meal or snack.",
+      "Change your bedsheets to freshen up your space.",
+      "Notice the colors around you for one minute.",
+      "Write an encouraging note to yourself."
+    ];
+    const habitBox = document.getElementById('habit-tip');
+    const newHabitBtn = document.getElementById('new-habit-btn');
+    function randomHabit() {
+      const idx = Math.floor(Math.random() * habitTips.length);
+      habitBox.textContent = habitTips[idx];
+    }
+    newHabitBtn.addEventListener('click', randomHabit);
+
+    // --- AI Chatbot, fully in-browser ---
+    const chatFab = document.getElementById('open-chatbot');
+    const chatModal = document.getElementById('chatbot-modal');
+    const chatModalBg = document.getElementById('chatbot-modal-bg');
+    const chatCloseBtn = document.getElementById('close-chatbot');
+    const chatHistoryDiv = document.getElementById('chat-history');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+
+    let chatHistory = [
+      { role: 'assistant', content: "Hi, I'm Spring 🌱! How are you feeling today?" }
+    ];
+
+    function openChatbot() {
+      chatFab.style.display = 'none';
+      chatModal.style.display = 'flex';
+      chatModalBg.classList.add('active');
+      renderChatHistory();
+      setTimeout(() => { chatInput.focus(); }, 300);
+    }
+    function closeChatbot() {
+      chatModal.style.display = 'none';
+      chatModalBg.classList.remove('active');
+      chatFab.style.display = 'flex';
+    }
+    chatFab.addEventListener('click', openChatbot);
+    chatCloseBtn.addEventListener('click', closeChatbot);
+    chatModalBg.addEventListener('click', closeChatbot);
+
+    function renderChatHistory() {
+      chatHistoryDiv.innerHTML = '';
+      chatHistory.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + (msg.role === 'user' ? 'msg-user' : 'msg-bot');
+        div.innerHTML = `
+          <div class="${msg.role === 'user' ? 'user-avatar' : 'bot-avatar'}">
+            ${msg.role === 'user' ? '🙂' : '🌱'}
+          </div>
+          <div class="msg-bubble">${msg.content.replace(/\n/g, '<br>')}</div>
+        `;
+        chatHistoryDiv.appendChild(div);
+      });
+      // --- Auto scroll to bottom ---
+      chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+    }
+    renderChatHistory();
+
+    function analyzeEmotion(text) {
+      text = text.toLowerCase();
+      if (text.includes('tired') || text.includes('exhausted') || text.includes('fatigue'))
+        return 'tired';
+      if (text.includes('anxious') || text.includes('anxiety') || text.includes('worry') || text.includes('panic'))
+        return 'anxious';
+      if (text.includes('sad') || text.includes('down') || text.includes('depress'))
+        return 'sad';
+      if (text.includes('happy') || text.includes('joy') || text.includes('good'))
+        return 'happy';
+      if (text.includes('stress') || text.includes('stressed') || text.includes('overwhelm'))
+        return 'stressed';
+      if (text.includes('lonely') || text.includes('alone'))
+        return 'lonely';
+      if (text.includes('motivation') || text.includes('motivated'))
+        return 'motivation';
+      if (text.includes('angry') || text.includes('frustrated') || text.includes('mad'))
+        return 'angry';
+      if (text.match(/\b(thank|thanks|appreciate|grateful)\b/))
+        return 'gratitude';
+      return 'neutral';
+    }
+
+    const emotionReplies = {
+      tired: [
+        "It sounds like you're feeling tired. Sometimes rest is the most productive thing you can do. Have you tried a gentle walk or a warm cup of tea?",
+        "Fatigue can weigh heavy. Remember, it's okay to take breaks and listen to your body.",
+        "Maybe a little sunlight or stretching could help. Be kind to yourself today."
+      ],
+      anxious: [
+        "It’s normal to feel anxious sometimes. Try focusing on your breath and grounding yourself in the present moment.",
+        "When anxiety visits, remind yourself: these feelings will pass. Maybe a calming activity, like listening to music or doodling, could help.",
+        "Would you like to try a short breathing exercise together?"
+      ],
+      sad: [
+        "I'm sorry you're feeling down. Remember, every feeling is valid, and spring brings new beginnings.",
+        "Sometimes talking about what’s making you sad can help. I’m here for you.",
+        "Would you like a gentle mood-lifting tip?"
+      ],
+      happy: [
+        "That’s wonderful to hear! Celebrate your happy moments, no matter how small.",
+        "Joy is contagious—spread it around you! What’s making you feel good today?",
+        "Let’s savor this spring feeling together!"
+      ],
+      stressed: [
+        "Stress can be overwhelming. Try breaking things into smaller steps, or take a mindful pause.",
+        "Remember, you don’t have to do everything at once. What’s one thing you could let go of right now?",
+        "Taking deep breaths and stretching your body can ease stress. Want to try?"
+      ],
+      lonely: [
+        "Loneliness can be tough. Would you like some ideas for reaching out or self-care?",
+        "You are not alone—even when it feels that way. I’m here to listen.",
+        "Connecting with nature or a pet can be comforting. Would you like a spring self-connection tip?"
+      ],
+      motivation: [
+        "Motivation can bloom and fade. Maybe set a gentle goal for today—something small and spring-like.",
+        "You’re doing better than you think. Even small steps count!",
+        "Let’s find a tiny action you can take to nurture yourself."
+      ],
+      angry: [
+        "Anger is a natural emotion. What’s beneath it? Sometimes a brisk walk or journaling can help.",
+        "Let’s breathe together for a moment. You deserve to feel heard.",
+        "Would you like a technique to help manage frustration?"
+      ],
+      gratitude: [
+        "Gratitude makes every season brighter. Thank you for sharing your feelings with me!",
+        "Appreciating the little things is powerful. What else are you grateful for today?",
+        "Let’s take a deep breath and feel the warmth of gratitude."
+      ],
+      neutral: [
+        "I'm here for you, whatever you're feeling. Want a springtime habit suggestion?",
+        "Tell me what’s on your mind, or ask for a mood-boosting tip!",
+        "Spring is a season of renewal—what would you like to talk about today?"
+      ]
+    };
+
+    function generateReply(messages) {
+      const history = messages.filter(msg => msg.role === 'user' || msg.role === 'assistant');
+      const lastUserMessage = messages.slice().reverse().find(msg => msg.role === 'user');
+      let memory = '';
+      if (history.length > 4) {
+        memory = "I remember what you’ve shared with me—thank you for letting me be here for you. ";
+      }
+      if (!lastUserMessage) return "I'm here to listen—tell me how you feel today!";
+      const emotion = analyzeEmotion(lastUserMessage.content);
+      const replies = emotionReplies[emotion] || emotionReplies['neutral'];
+      let reply = replies[Math.floor(Math.random() * replies.length)];
+      // Special followups
+      if (emotion === 'sad' && history.some(m => m.content && m.content.match(/cry|tears|weep/))) {
+        reply = "Tears are a healthy release. It's okay to feel deeply—I'm here for you. If you'd like, I can suggest a gentle activity.";
+      }
+      if (emotion === 'anxious' && lastUserMessage.content.match(/panic|can't breathe|heart/)) {
+        reply = "Panic can feel frightening. Try to focus on slow, deep breaths. Would you like a simple breathing technique?";
+      }
+      return memory + reply;
+    }
+
+    function sendChatMessage(text) {
+      chatHistory.push({ role: 'user', content: text });
+      renderChatHistory();
+      chatInput.value = '';
+      setTimeout(() => {
+        const reply = generateReply(chatHistory);
+        chatHistory.push({ role: 'assistant', content: reply });
+        renderChatHistory();
+      }, 550);
+    }
+    chatForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (text) sendChatMessage(text);
+    });
+
+    // --- On Page Load ---
+    fetchMoodData();
+    randomHabit();
+  </script>
+</body>
+</html>
